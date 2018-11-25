@@ -120,6 +120,7 @@ class ArtController extends Yaf_Controller_Abstract
         }
         return true;
     }
+
     public function getAction()
     {
         $artId = $this->getRequest()->getQuery("artId","0");
@@ -142,6 +143,21 @@ class ArtController extends Yaf_Controller_Abstract
     }
     public function listAction()
     {
+        $pageNo = $this->getRequest()->getQuery("pageNo","0");
+        $pageSize = $this->getRequest()->getQuery("pageSize","10");
+        $cate = $this->getRequest()->getQuery("cate","0");
+        $status = $this->getRequest()->getQuery("status","online");
+
+        $model = new ArtModel();
+        if ($data = $model->list($pageNo,$pageSize,$cate,$status)){
+            echo json_encode(array(
+                "errno"=>0,
+                "errmsg"=>"",
+                "data"=>$data
+            ));
+        }else{
+            echo json_encode(array("errno"=>-2012,"errmsg"=>"获取文章列表失败"));
+        }
         return true;
     }
     private function _isAdmin()

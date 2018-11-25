@@ -132,4 +132,61 @@ class ArtModel
         return $data;
     }
 
+    public function list($pageNo=1,$pageSize=10,$cate=0,$status='online')
+    {
+        $start = $pageNo*$pageSize+($pageNo==0?0:1);
+        if ($cate == 0){
+            $filter = array($status,intval($start),intval($pageSize));
+            $query = $this->_db->prepare("select `id`,`title`,`contents`,`author`,`cate`,`ctime`,`mtime`,`status` from `art` where `status`=? order by `ctime` desc limit ?,?");
+        }else{
+            $filter = array(intval($cate),$status,intval($start),intval($pageSize));
+            $query = $this->_db->prepare("select `id`,`title`,`contents`,`author`,`cate`,`ctime`,`mtime`,`status` from `art` where `cate`=?  and `status`=? order by `ctime` desc  limit ?,?");
+        }
+        $stat = $query->execute($filter);
+        $ret = $query->fetchAll();
+        if (!$ret){
+            $this->errno = -2011;
+            if (($query->errorInfo())[2]!==null){
+                $this->errmsg = "获取文章列表失败,ErrInfo:".end($query->errorInfo());
+            }else{
+                $this->errmsg = "";
+            }
+            return false;
+        }
+
+        $data = array();
+        $cateInfo =array();
+        foreach ($ret as $item){
+            //获取分类信息
+            if (isset($cateInfo[$item['cate']])){
+                $cateName = $cateInfo[$item['cate']];
+            }else{
+                $query = $this->_db->prepare("select `name` from `cate` where `id`=?");
+                $query->execute(array($item['cate']));
+                $retCate = $query->fetchAll();
+                if (!$retCate){
+                    $this->errno = -2010;
+                    $this->errmsg = "获取分类信息失败,ErrInfo:".end($query->errorInfo());
+                    return false;
+                }
+                $cateName = $cateInfo[$item['cate']] = $retCate[0]['name'];
+            }
+
+            //正文太长 => 剪切
+            $contents = mb_strlen($item['contents'])>30 ? mb_substr($item['contents'],0,30)."...":$item['contents'];
+            $data[] = array(
+                'id'=>intval($item['id']),
+                'title'=>$item['title'],
+                'contents'=>$contents,
+                'author'=>$item['author'],
+                'cateName'=>$cateName,
+                'cateId'=>intval($item['cate']),
+                'ctime'=>$item['ctime'],
+                'mtime'=>$item['mtime'],
+                'status'=>$item['status']
+            );
+        }
+        return $data;
+    }
+
 }
