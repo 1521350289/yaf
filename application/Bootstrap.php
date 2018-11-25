@@ -23,7 +23,7 @@ class Bootstrap extends Yaf_Bootstrap_Abstract {
 
 	public function _initRoute(Yaf_Dispatcher $dispatcher) {
 		//在这里注册自己的路由协议,默认使用简单路由
-        $router = Yaf_Dispatcher::getInstance()->getRouter();
+        /*$router = Yaf_Dispatcher::getInstance()->getRouter();
         //创建一个路由协议实例
         $route = new Yaf_Route_Rewrite(
             'user/reg/:username',
@@ -33,7 +33,7 @@ class Bootstrap extends Yaf_Bootstrap_Abstract {
             )
         );
         //使用路由器装载路由协议
-        $router->addRoute('product', $route);
+        $router->addRoute('product', $route);*/
 	}
 	
 	public function _initView(Yaf_Dispatcher $dispatcher) {

@@ -10,6 +10,7 @@ class UserModel
     {
         if (!$this->_db){
             $this->_db = new PDO("mysql:host=127.0.0.1;dbname=yaf;","homestead",'secret',array(PDO::ATTR_PERSISTENT=>true));
+            $this->_db->query("set names utf8");
         }
     }
 
